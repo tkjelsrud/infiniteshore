@@ -4,6 +4,167 @@
 </head>
 
 <body>
+  <div align="center">
 
+  </div>
+
+  <script type="text/javascript">
+  u = 32;
+  w = 24;
+  h = 16;
+
+  let Application = PIXI.Application,
+      Container = PIXI.Container,
+      loader = PIXI.Loader.shared,
+      resources = PIXI.Loader.shared.resources,
+      Graphics = PIXI.Graphics,
+      TextureCache = PIXI.utils.TextureCache,
+      Sprite = PIXI.Sprite;
+
+  var renderer = PIXI.autoDetectRenderer(800, 600,{backgroundColor : 0x1099bb});
+  //document.body.appendChild(renderer.view);
+
+      // create the root of the scene graph
+
+  //Create a Pixi Application
+  let app = new Application({
+      width: u*w,
+      height: u*h,
+      antialiasing: true,
+      transparent: false,
+      resolution: 1
+    }
+  );
+
+  document.body.appendChild(app.view);
+
+  var farTexture = PIXI.Texture.fromImage("resources/bg-far.jpeg");
+  far = new PIXI.extras.TilingSprite(farTexture, u*w, u*10);
+  far.position.x = 0;
+  far.position.y = 0;
+  app.stage.addChild(far);
+
+  var starTexture = PIXI.Texture.fromImage("resources/bg-stars.png");
+  stars = new PIXI.extras.TilingSprite(starTexture, u*w, u*10);
+  stars.position.x = 0;
+  stars.position.y = 0;
+  app.stage.addChild(stars);
+
+  var buildTexture = PIXI.Texture.fromImage("resources/mg-city.png");
+  mity = new PIXI.extras.TilingSprite(buildTexture, u*w, u*6);
+  mity.position.x = 0;
+  mity.position.y = u*8;
+  app.stage.addChild(mity);
+
+  var cityTexture = PIXI.Texture.fromImage("resources/bg-city.png");
+  city = new PIXI.extras.TilingSprite(cityTexture, u*w, u*10);
+  city.position.x = 0;
+  city.position.y = u*4;
+  app.stage.addChild(city);
+
+
+
+
+  /*let rectangle = new Graphics();
+  //rectangle.lineStyle(4, 0xFF3300, 1);
+  rectangle.beginFill(0x66CCFF);
+  rectangle.drawRect(0, 0, w*u, u);
+  rectangle.endFill();
+  //rectangle.x = 170;
+  //rectangle.y = 170;
+  app.stage.addChild(rectangle);
+
+  rectangle.beginFill(0x66CC33);
+  rectangle.drawRect(0, u, w*u, u);
+  rectangle.endFill();
+  //rectangle.x = 170;
+  //rectangle.y = 170;
+  app.stage.addChild(rectangle);*/
+
+  /*let ground = new Graphics();
+  //rectangle.lineStyle(4, 0xFF3300, 1);
+  ground.beginFill(0x666666);
+  ground.drawRect(0, 12*u, w*u, 8*u);
+  ground.endFill();
+
+  app.stage.addChild(ground);*/
+
+
+  /*let triangle = new Graphics();
+  triangle.beginFill(0x66FF33);
+  triangle.drawPolygon([
+      0, 12*u,             //First point
+      2*u, 10*u,              //Second point
+      4*u, 12*u                 //Third point
+  ]);
+  triangle.endFill();
+  app.stage.addChild(triangle);*/
+
+  let growth = {x:0, y: 0, last: null, cont: new PIXI.Container()};
+  app.stage.addChild(growth.cont);
+
+  function chance(ch) {
+    return (ch >= Math.floor(Math.random() * 100) + 1);
+  }
+
+  function grow() {
+    s = u / 4;
+    if(growth.last && chance(10)) {
+      let g = new Graphics();
+      //rectangle.lineStyle(4, 0xFF3300, 1);
+      let loc = {x: growth.x, y: growth.y};
+
+      g.beginFill(0xFFFFFF);
+      g.drawRect(loc.x, loc.y, s, s);
+      rot = 15; //Math.random() * 360;
+      rotate(g, rot);
+      g.endFill();
+      growth.cont.addChild(g);
+      growth.last = g;
+
+      growth.x = loc.x + Math.cos(rot);
+      growth.y = loc.y + (Math.sin(rot)) - s;
+    }
+    if(growth.last == null) {
+      let g = new Graphics();
+      //rectangle.lineStyle(4, 0xFF3300, 1);
+      g.beginFill(0xFFFFFF);
+      g.drawRect(11*u, 15*u, s, s);
+      growth.x = 11*u;
+      growth.y = 15*u;
+      g.endFill();
+      growth.cont.addChild(g);
+      growth.last = g;
+    }
+    //growth.x -= 0.4;
+  }
+
+  animate();
+
+  function animate() {
+    requestAnimationFrame(animate);
+
+    far.tilePosition.x -= 0.03;
+    stars.tilePosition.x -= 0.06;
+    city.tilePosition.x -= 0.24;
+    mity.tilePosition.x -= 0.12;
+
+     // just for fun, let's rotate mr rabbit a little
+     //rectangle.y += 0.1;
+
+     grow();
+
+     // render the container
+     renderer.render(app.stage);
+  }
+
+  function rotate(obj, rot) {
+      obj.position.rotation = rot - Math.PI / 2;
+      obj.position.x = obj.position.x - Math.cos(rot);
+      obj.position.y = obj.position.y - Math.sin(rot);
+  }
+
+
+  </script>
 </body>
 </html>
