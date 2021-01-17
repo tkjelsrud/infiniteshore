@@ -1,5 +1,12 @@
 <html>
 <head>
+  <style>
+  body {
+    background-color: black;
+    margin: 3em;
+    }
+  </style>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/5.3.7/pixi.min.js" integrity="sha512-k8E2ILMRTO1YBnA2dvTDfsZs7f07gazZDQYbsv2NCxnM9hYFwCKu+rWISm8/fFB1I/gi0tgnURcXJVR7GlE0BA==" crossorigin="anonymous"></script>
 </head>
 
@@ -9,9 +16,10 @@
   </div>
 
   <script type="text/javascript">
-  u = 32;
-  w = 24;
-  h = 16;
+  u = 48;
+  w = 40;
+  h = 30;
+  anim = true;
 
   let Application = PIXI.Application,
       Container = PIXI.Container,
@@ -38,128 +46,107 @@
 
   document.body.appendChild(app.view);
 
-  var farTexture = PIXI.Texture.fromImage("resources/bg-far.jpeg");
-  far = new PIXI.extras.TilingSprite(farTexture, u*w, u*10);
-  far.position.x = 0;
-  far.position.y = 0;
-  app.stage.addChild(far);
+    var farTexture = PIXI.Texture.fromImage("resources/bg-sky3.png");
+    far = new PIXI.extras.TilingSprite(farTexture, u*w, u*h);
+    //far.scale.x = 3;
+    //far.scale.y = 3;
+    far.position.x = 0;
+    far.position.y = 0;
+    app.stage.addChild(far);
 
-  var starTexture = PIXI.Texture.fromImage("resources/bg-stars.png");
-  stars = new PIXI.extras.TilingSprite(starTexture, u*w, u*10);
-  stars.position.x = 0;
-  stars.position.y = 0;
-  app.stage.addChild(stars);
+    /*var layTexture = PIXI.Texture.fromImage("resources/sky-blend.png");
+    lay = new PIXI.extras.TilingSprite(layTexture, u*w, u*h);
+    lay.alpha = 0.2;
+    lay.position.x = 0;
+    lay.position.y = 0;
+    app.stage.addChild(lay);*/
 
-  var buildTexture = PIXI.Texture.fromImage("resources/mg-city.png");
-  mity = new PIXI.extras.TilingSprite(buildTexture, u*w, u*6);
-  mity.position.x = 0;
-  mity.position.y = u*8;
-  app.stage.addChild(mity);
+    var starTexture = PIXI.Texture.fromImage("resources/bg-stars2.png");
+    stars = new PIXI.extras.TilingSprite(starTexture, u*w, u*h);
+    stars.alpha = 0.4;
+    stars.position.x = 0;
+    stars.position.y = 0;
+    app.stage.addChild(stars);
 
-  var cityTexture = PIXI.Texture.fromImage("resources/bg-city.png");
-  city = new PIXI.extras.TilingSprite(cityTexture, u*w, u*10);
-  city.position.x = 0;
-  city.position.y = u*4;
-  app.stage.addChild(city);
+    var mountBTex = PIXI.Texture.fromImage("resources/vfar-mount.png");
+    mntb = new PIXI.extras.TilingSprite(mountBTex, u*w, u*16);
+    mntb.position.x = 0;
+    mntb.position.y = u*12.5;
+    app.stage.addChild(mntb);
 
+    var mountATex = PIXI.Texture.fromImage("resources/far-mount.png");
+    mnta = new PIXI.extras.TilingSprite(mountATex, u*w, u*22);
+    mnta.position.x = 0;
+    mnta.position.y = u*11;
+    app.stage.addChild(mnta);
 
-
-
-  /*let rectangle = new Graphics();
-  //rectangle.lineStyle(4, 0xFF3300, 1);
-  rectangle.beginFill(0x66CCFF);
-  rectangle.drawRect(0, 0, w*u, u);
-  rectangle.endFill();
-  //rectangle.x = 170;
-  //rectangle.y = 170;
-  app.stage.addChild(rectangle);
-
-  rectangle.beginFill(0x66CC33);
-  rectangle.drawRect(0, u, w*u, u);
-  rectangle.endFill();
-  //rectangle.x = 170;
-  //rectangle.y = 170;
-  app.stage.addChild(rectangle);*/
-
-  /*let ground = new Graphics();
-  //rectangle.lineStyle(4, 0xFF3300, 1);
-  ground.beginFill(0x666666);
-  ground.drawRect(0, 12*u, w*u, 8*u);
-  ground.endFill();
-
-  app.stage.addChild(ground);*/
+    var mountCTex = PIXI.Texture.fromImage("resources/fg-mnt.png");
+    mntc = new PIXI.extras.TilingSprite(mountCTex, u*w, u*4);
+    mntc.position.x = 0;
+    mntc.position.y = u*27.5;
+    app.stage.addChild(mntc);
 
 
-  /*let triangle = new Graphics();
-  triangle.beginFill(0x66FF33);
-  triangle.drawPolygon([
-      0, 12*u,             //First point
-      2*u, 10*u,              //Second point
-      4*u, 12*u                 //Third point
-  ]);
-  triangle.endFill();
-  app.stage.addChild(triangle);*/
+    var treeTexture = PIXI.Texture.fromImage("resources/tree-4.png");
+    tree = new PIXI.extras.TilingSprite(treeTexture, u*16, u*24);
+    tree.scale.x = 1.3;
+    tree.scale.y = 1.3;
+    tree.position.x = u*12;
+    tree.position.y = u*6;
+    app.stage.addChild(tree);
 
-  let growth = {x:0, y: 0, last: null, cont: new PIXI.Container()};
-  app.stage.addChild(growth.cont);
+    var leavesTexture = PIXI.Texture.fromImage("resources/leaves.png");
+    var leaves = new Array();
+    for(i = 0; i < 100; i++) {
+      l = new PIXI.extras.TilingSprite(leavesTexture, u*2, u*2);
+      l.tilePosition.x = u * Math.floor(Math.random() * 3);
+      l.tilePosition.y = u * Math.floor(Math.random() * 3);
+      l.scale.x = 1.5;
+      l.scale.y = 1.5;
+      l.position.x = u* (16 + Math.floor(Math.random() * 15));
+      l.position.y = u* (10 + Math.floor(Math.random() * 10));
+      l.rotation = Math.floor(Math.random() * 360);
+      app.stage.addChild(l);
+    }
+
+
+  //let growth = {x:0, y: 0, frm: 0, itr: 0, last: null, cont: new PIXI.Container()};
+  //app.stage.addChild(growth.cont);
 
   function chance(ch) {
     return (ch >= Math.floor(Math.random() * 100) + 1);
   }
 
-  function grow() {
-    s = u / 4;
-    if(growth.last && chance(10)) {
-      let g = new Graphics();
-      //rectangle.lineStyle(4, 0xFF3300, 1);
-      let loc = {x: growth.x, y: growth.y};
-
-      g.beginFill(0xFFFFFF);
-      g.drawRect(loc.x, loc.y, s, s);
-      rot = 15; //Math.random() * 360;
-      rotate(g, rot);
-      g.endFill();
-      growth.cont.addChild(g);
-      growth.last = g;
-
-      growth.x = loc.x + Math.cos(rot);
-      growth.y = loc.y + (Math.sin(rot)) - s;
-    }
-    if(growth.last == null) {
-      let g = new Graphics();
-      //rectangle.lineStyle(4, 0xFF3300, 1);
-      g.beginFill(0xFFFFFF);
-      g.drawRect(11*u, 15*u, s, s);
-      growth.x = 11*u;
-      growth.y = 15*u;
-      g.endFill();
-      growth.cont.addChild(g);
-      growth.last = g;
-    }
-    //growth.x -= 0.4;
-  }
-
   animate();
 
+  function parallaxScrolling() {
+    mnta.tilePosition.x -= 0.4;
+    stars.tilePosition.y += 0.4;
+    stars.tilePosition.x += 0.2;
+    mntb.tilePosition.x -= 0.12;
+    mntc.tilePosition.x -= 0.6;
+  }
+
   function animate() {
-    requestAnimationFrame(animate);
+    if(anim) requestAnimationFrame(animate);
 
-    far.tilePosition.x -= 0.03;
-    stars.tilePosition.x -= 0.06;
-    city.tilePosition.x -= 0.24;
-    mity.tilePosition.x -= 0.12;
+    parallaxScrolling();
 
-     // just for fun, let's rotate mr rabbit a little
-     //rectangle.y += 0.1;
-
-     grow();
-
-     // render the container
      renderer.render(app.stage);
+
+     // later, in the pan function
+      //app.stage.x = -100
+      //app.stage.y = -100
+
+      // later in the zoom function
+      //app.stage.scale.x += 0.003;
+      //app.stage.scale.y += 0.003;
+      //app.stage.x -= 0.5;
+      //app.stage.y -= 1;
   }
 
   function rotate(obj, rot) {
-      obj.position.rotation = rot - Math.PI / 2;
+      obj.position.rotation = rot - (Math.PI / 2);
       obj.position.x = obj.position.x - Math.cos(rot);
       obj.position.y = obj.position.y - Math.sin(rot);
   }
