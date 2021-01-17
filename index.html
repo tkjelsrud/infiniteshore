@@ -8,6 +8,8 @@
   </style>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/5.3.7/pixi.min.js" integrity="sha512-k8E2ILMRTO1YBnA2dvTDfsZs7f07gazZDQYbsv2NCxnM9hYFwCKu+rWISm8/fFB1I/gi0tgnURcXJVR7GlE0BA==" crossorigin="anonymous"></script>
+  <script src="lib/animatorClass.js"></script>
+  <script src="lib/treeClass.js"></script>
 </head>
 
 <body>
@@ -20,6 +22,7 @@
   w = 40;
   h = 30;
   anim = true;
+  animList = new Array();
 
   let Application = PIXI.Application,
       Container = PIXI.Container,
@@ -87,7 +90,7 @@
     app.stage.addChild(mntc);
 
 
-    var treeTexture = PIXI.Texture.fromImage("resources/tree-4.png");
+    /*var treeTexture = PIXI.Texture.fromImage("resources/tree-4.png");
     tree = new PIXI.extras.TilingSprite(treeTexture, u*16, u*24);
     tree.scale.x = 1.3;
     tree.scale.y = 1.3;
@@ -107,7 +110,7 @@
       l.position.y = u* (10 + Math.floor(Math.random() * 10));
       l.rotation = Math.floor(Math.random() * 360);
       app.stage.addChild(l);
-    }
+    }*/
 
 
   //let growth = {x:0, y: 0, frm: 0, itr: 0, last: null, cont: new PIXI.Container()};
@@ -127,12 +130,67 @@
     mntc.tilePosition.x -= 0.6;
   }
 
+  /*function addEvent(id, style) {
+    removeEvent(id);
+    animEvents.push({'id': id, 'style': style, 'itr': 0, 'obj': null});
+  }
+
+  function removeEvent(id) {
+    console.log(id);
+    for(i = animEvents.length -1; i >= 0; i--) {
+      if(animEvents[i].id == id) {
+        return animEvents.splice(i, 1);
+      }
+    }
+    return false;
+  }*/
+
   function animate() {
     if(anim) requestAnimationFrame(animate);
 
     parallaxScrolling();
 
-     renderer.render(app.stage);
+    for(i = 0; i < animList.length; i++) {
+      animList[i].frame();
+    }
+
+    // aEvent = {'id': 'note:G2', 'style': 'treeGrow', 'itr': 0, 'obj': null}
+
+    /*aExpire = new Array();
+
+
+
+    for(i = 0; i < animEvents.length; i++) {
+      ae = animEvents[i];
+      if(ae.style == "growTree") {
+        if(ae.itr % 10 == 0) {
+
+        }
+      }
+      if(ae.style == "zoom") {
+        app.stage.scale.x += 0.003;
+        app.stage.scale.y += 0.003;
+        app.stage.x -= 0.5;
+        app.stage.y -= 1;
+        if(ae.itr > 100) {
+          aExpire.push(ae.id);
+        }
+      }
+      if(ae.style == "zoomReset") {
+        app.stage.scale.x = 1;
+        app.stage.scale.y = 1;
+        app.stage.x = 0;
+        app.stage.y = 0;
+        aExpire.push(ae.id);
+      }
+      ae.itr++;
+    }
+
+    while(aExpire.length > 0) {
+      removeEvent(aExpire.pop());
+    }*/
+
+    renderer.render(app.stage);
 
      // later, in the pan function
       //app.stage.x = -100
@@ -145,11 +203,11 @@
       //app.stage.y -= 1;
   }
 
-  function rotate(obj, rot) {
+  /*function rotate(obj, rot) {
       obj.position.rotation = rot - (Math.PI / 2);
       obj.position.x = obj.position.x - Math.cos(rot);
       obj.position.y = obj.position.y - Math.sin(rot);
-  }
+  }*/
 
 
   </script>
