@@ -10,6 +10,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/5.3.7/pixi.min.js" integrity="sha512-k8E2ILMRTO1YBnA2dvTDfsZs7f07gazZDQYbsv2NCxnM9hYFwCKu+rWISm8/fFB1I/gi0tgnURcXJVR7GlE0BA==" crossorigin="anonymous"></script>
   <script src="lib/animatorClass.js"></script>
   <script src="lib/treeClass.js"></script>
+  <script src="lib/midi.js"></script>
 </head>
 
 <body>
@@ -66,15 +67,24 @@
 
     var starTexture = PIXI.Texture.fromImage("resources/bg-stars2.png");
     stars = new PIXI.extras.TilingSprite(starTexture, u*w, u*h);
-    stars.alpha = 0.4;
+    stars.alpha = 0.5;
     stars.position.x = 0;
     stars.position.y = 0;
     app.stage.addChild(stars);
 
+    var cloudTexture = PIXI.Texture.fromImage("resources/clouds-1.png");
+    cloudA = new PIXI.extras.TilingSprite(cloudTexture, u*w*2, u*6);
+    cloudA.position.x = 0;
+    cloudA.position.y = u*14;
+    cloudA.scale.x = 0.5;
+    cloudA.scale.y = 0.5;
+    cloudA.alpha = 0.4;
+    app.stage.addChild(cloudA);
+
     var mountBTex = PIXI.Texture.fromImage("resources/vfar-mount.png");
     mntb = new PIXI.extras.TilingSprite(mountBTex, u*w, u*16);
     mntb.position.x = 0;
-    mntb.position.y = u*12.5;
+    mntb.position.y = u*15;
     app.stage.addChild(mntb);
 
     var mountATex = PIXI.Texture.fromImage("resources/far-mount.png");
@@ -82,6 +92,15 @@
     mnta.position.x = 0;
     mnta.position.y = u*11;
     app.stage.addChild(mnta);
+
+    var cloudTexture = PIXI.Texture.fromImage("resources/clouds-1.png");
+    cloudB = new PIXI.extras.TilingSprite(cloudTexture, u*w*1.5, u*6);
+    cloudB.position.x = 0;
+    cloudB.position.y = u*16;
+    cloudB.scale.x = 0.7;
+    cloudB.scale.y = 0.7;
+    cloudB.alpha = 0.6;
+    app.stage.addChild(cloudB);
 
     var mountCTex = PIXI.Texture.fromImage("resources/fg-mnt.png");
     mntc = new PIXI.extras.TilingSprite(mountCTex, u*w, u*4);
@@ -123,11 +142,14 @@
   animate();
 
   function parallaxScrolling() {
+    far.tilePosition.y += 0.4;
     mnta.tilePosition.x -= 0.4;
     stars.tilePosition.y += 0.4;
     stars.tilePosition.x += 0.2;
     mntb.tilePosition.x -= 0.12;
-    mntc.tilePosition.x -= 0.6;
+    mntc.tilePosition.x -= 0.9;
+    cloudA.tilePosition.x += 0.6;
+    cloudB.tilePosition.x += 1.0;
   }
 
   /*function addEvent(id, style) {
@@ -145,14 +167,104 @@
     return false;
   }*/
 
+  let treeList = new Array(0, 0, 0, 0);
+
+  function pickATreeSpot(label) {
+    // Check if not full
+    var free = 0;
+    for(var i = 0; i < treeList.length; i++) {
+      if(treeList[i] == 0)
+        free++;
+    }
+    if(free == 0)
+      return null;
+
+    // Not great :D
+    while(true) {
+      locX = Math.floor(Math.random() * 4);
+      if(treeList[locX] == 0) {
+        treeList[locX] = label;
+        return locX;
+      }
+    }
+  }
+
+  function freeTreeSpot(label) {
+    for(var i = 0; i < treeList.length; i++) {
+      if(treeList[i] == label)
+        treeList[i] = 0;
+    }
+  }
+
+  function createAnimationEvent(id, typ, note = "") {
+    let callSign = typ + id;
+
+    switch(typ) {
+      case "tree":
+        locX = pickATreeSpot(callSign);
+        if(locX != null) {
+          //callSign = typ + locX;
+          // Needs to be smarter, pick a free spot
+
+          a = getAnimationEvent(callSign);
+
+          if(a) {
+            // Already exists
+            return null;
+          }
+          else {
+            // ...
+            t = new AnimTree(callSign);
+            t.setLabel(note);
+            t.start(locX * 8, 12);
+            animList.push(t);
+          }
+        }
+        break;
+
+      }
+    return callSign;
+
+  }
+
+  function stopAnimationEvent(callSign) {
+    //console.log("stop " + callSign);
+    a = getAnimationEvent(callSign);
+    if(a) {
+      a.startRegress();
+      freeTreeSpot(callSign);
+    }
+  }
+
+  function getAnimationEvent(id) {
+    for(i = 0; i < animList.length; i++) {
+      if(animList[i].id == id)
+        return animList[i];
+    }
+    return null;
+  }
+
   function animate() {
     if(anim) requestAnimationFrame(animate);
 
     parallaxScrolling();
 
     for(i = 0; i < animList.length; i++) {
-      animList[i].frame();
+      a = animList[i];
+
+      if(a && a.active)
+        a.frame();
+
+      if(a && !a.active) {
+        let oList = a.getStageObjects();
+        for(j = 0; j < oList.length; j++) {
+          app.stage.removeChild(oList[j]);
+        }
+        animList[i] = null;
+      }
     }
+
+    animList = animList.filter(function (el) {return el != null;});
 
     // aEvent = {'id': 'note:G2', 'style': 'treeGrow', 'itr': 0, 'obj': null}
 
@@ -190,7 +302,7 @@
       removeEvent(aExpire.pop());
     }*/
 
-    renderer.render(app.stage);
+    //renderer.render(app.stage);
 
      // later, in the pan function
       //app.stage.x = -100
