@@ -10,6 +10,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/5.3.7/pixi.min.js" integrity="sha512-k8E2ILMRTO1YBnA2dvTDfsZs7f07gazZDQYbsv2NCxnM9hYFwCKu+rWISm8/fFB1I/gi0tgnURcXJVR7GlE0BA==" crossorigin="anonymous"></script>
   <script src="lib/animatorClass.js"></script>
   <script src="lib/treeClass.js"></script>
+  <script src="lib/zoomClass.js"></script>
   <script src="lib/midi.js"></script>
 </head>
 
@@ -200,6 +201,26 @@
     let callSign = typ + id;
 
     switch(typ) {
+      case "zoom":
+        z = getAnimationEvent(id);
+        if(z) {
+          // Already zooming
+          if(z.isZoomReady())
+            z.start(0, 0);
+        }
+        else {
+          z = new AnimZoom(id);
+          z.start(0, 0);
+          animList.push(z);
+        }
+        break;
+      case "zoomOut":
+        z = getAnimationEvent(id);
+        if(z) {
+          z.startRegress();
+        }
+        break;
+
       case "tree":
         locX = pickATreeSpot(callSign);
         if(locX != null) {
